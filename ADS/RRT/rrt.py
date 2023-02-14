@@ -2,11 +2,13 @@ import random
 import math
 import matplotlib.pyplot as plt
 
+
 class Node:
     def __init__(self, x, y):
         self.x = x
         self.y = y
         self.parent = None
+
 
 class RRT:
     def __init__(self, start, goal, obstacle_list, rand_area, expand_dis=1.0, goal_sample_rate=20, max_iter=1000):
@@ -31,15 +33,17 @@ class RRT:
             nearest_ind = self.get_nearest_node_index(self.node_list, rand_node)
             nearest_node = self.node_list[nearest_ind]
             new_node = self.steer(nearest_node, rand_node, self.expand_dis)
-            if self.check_collision(new_node, self.obstacle_list):
+            if not self.check_collision(self.obstacle_list, new_node.x, new_node.y):
                 self.node_list.append(new_node)
-            if self.calc_dist_to_goal(self.node_list[-1].x, self.node_list[-1].y) <= self.expand_dis:
+            if self.calc_dist_to_goal(self.node_list[-1].x, self.node_list[-1].y,
+                                      [self.goal.x, self.goal.y]) <= self.expand_dis:
                 final_node = self.steer(self.node_list[-1], self.goal, self.expand_dis)
-                if self.check_collision(final_node, self.obstacle_list):
+                if not self.check_collision(self.obstacle_list, final_node.x, final_node.y):
+                    self.node_list.append(final_node)
+                    self.draw_graph(self.node_list, self.start, self.goal, self.obstacle_list)
                     return self.generate_final_course(len(self.node_list) - 1)
             if i % 5 == 0:
-                self.draw_graph()
-
+                self.draw_graph(self.node_list, self.start, self.goal, self.obstacle_list)
         return None
 
     def steer(self, from_node, to_node, extend_length=float("inf")):
@@ -82,29 +86,31 @@ class RRT:
 
         return minind
 
-def check_collision(obstacle_list, x, y):
-    for (ox, oy, r) in obstacle_list:
-        if math.sqrt((ox - x) ** 2 + (oy - y) ** 2) <= r:
-            return True  # collision
-    return False  # no collision
+    def check_collision(self, obstacle_list, x, y):
+        for (ox, oy, r) in obstacle_list:
+            if math.sqrt((ox - x) ** 2 + (oy - y) ** 2) <= r:
+                return True  # collision
+        return False  # no collision
 
+    def calc_dist_to_goal(self, x, y, goal):
+        return math.sqrt((x - goal[0]) ** 2 + (y - goal[1]) ** 2)
 
-def calc_dist_to_goal(x, y, goal):
-    return math.sqrt((x - goal[0]) ** 2 + (y - goal[1]) ** 2)
+    def draw_graph(self, graph, start, goal, obstacle_list):
+        plt.clf()
+        plt.plot(start.x, start.y, "bs")
+        plt.plot(goal.x, goal.y, "rs")
+        for (ox, oy, r) in obstacle_list:
+            circle = plt.Circle((ox, oy), r, color="k")
+            plt.gcf().gca().add_artist(circle)
 
-
-def draw_graph(graph, start, goal, obstacle_list):
-    plt.clf()
-    plt.plot(start[0], start[1], "bs")
-    plt.plot(goal[0], goal[1], "rs")
-    for (ox, oy, r) in obstacle_list:
-        circle = plt.Circle((ox, oy), r, color="k")
-        plt.gcf().gca().add_artist(circle)
-
-    for (x, y) in graph:
-        for (nx, ny) in graph[(x, y)]:
-            plt.plot([x, nx], [y, ny], "-g")
-
-    plt.axis("equal")
-    plt.grid(True)
-    plt.pause(0.01)
+        # for (x, y) in graph:
+        #     for (nx, ny) in graph[(x, y)]:
+        #         plt.plot([x, nx], [y, ny], "-g")
+        for node in graph:
+            nnode = node.parent
+            if nnode:
+                plt.plot([node.x, nnode.x], [node.y, nnode.y], "-g")
+            plt.scatter(node.x, node.y)
+        plt.axis("equal")
+        plt.grid(True)
+        plt.pause(0.1)
