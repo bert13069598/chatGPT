@@ -81,3 +81,30 @@ class RRT:
         minind = dlist.index(min(dlist))
 
         return minind
+
+def check_collision(obstacle_list, x, y):
+    for (ox, oy, r) in obstacle_list:
+        if math.sqrt((ox - x) ** 2 + (oy - y) ** 2) <= r:
+            return True  # collision
+    return False  # no collision
+
+
+def calc_dist_to_goal(x, y, goal):
+    return math.sqrt((x - goal[0]) ** 2 + (y - goal[1]) ** 2)
+
+
+def draw_graph(graph, start, goal, obstacle_list):
+    plt.clf()
+    plt.plot(start[0], start[1], "bs")
+    plt.plot(goal[0], goal[1], "rs")
+    for (ox, oy, r) in obstacle_list:
+        circle = plt.Circle((ox, oy), r, color="k")
+        plt.gcf().gca().add_artist(circle)
+
+    for (x, y) in graph:
+        for (nx, ny) in graph[(x, y)]:
+            plt.plot([x, nx], [y, ny], "-g")
+
+    plt.axis("equal")
+    plt.grid(True)
+    plt.pause(0.01)
