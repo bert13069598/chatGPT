@@ -7,3 +7,7 @@ I display the amazing codes created by chatGPT.
 
 - result<br>
 <img src= "https://github.com/bert13069598/chatGPT/blob/master/ADS/RRT/Figure_2.png">
+
+## A*
+- result<br>
+<img src= "https://github.com/bert13069598/chatGPT/blob/master/ADS/A/Figure.png">

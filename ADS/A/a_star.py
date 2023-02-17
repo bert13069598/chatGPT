@@ -1,3 +1,5 @@
+import time
+
 import pygame
 import math
 from queue import PriorityQueue
@@ -197,6 +199,7 @@ if __name__ == '__main__':
 
     while run:
         draw(WIN, grid, ROWS, WIDTH)
+        pygame.image.save(WIN, 'Figure.png')
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
