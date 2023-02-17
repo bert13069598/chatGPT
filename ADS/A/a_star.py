@@ -187,8 +187,8 @@ def get_clicked_pos(pos, rows, width):
 
 
 if __name__ == '__main__':
-    ROWS = 50
-    WIDTH = 800
+    ROWS = 30
+    WIDTH = 600
     WIN = pygame.display.set_mode((WIDTH, WIDTH))
     pygame.display.set_caption("A* Pathfinding Algorithm")
 
